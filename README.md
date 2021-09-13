@@ -11,6 +11,8 @@ The reason this works is that modern browsers have now built in the libraries an
 ## AppTemplate Logical Structure
 The key to AppTemplate is an application structure, which if carefully adhered to, will go a long way toward ensuring clean, maintainable code.  
 
+![layers-blocks](/app-structure-blocks.jpg "AppTemplate structure")
+
 
 
 ## AppTemplate File Structure
