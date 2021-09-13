@@ -112,8 +112,45 @@ Again, Pages don't know about other Pages, Blocks don't know about other Blocks,
 ### Template pattern
 Templates, meaning snippets of html that need to be merged with data are not official concepts in AppTemplate.  However, modern javascript provides us a convenient way to get very powerful templates.  This method can be used with blocks, tags, or pages as needed.  Templates can be defined inline, or in separate modules.
 
+here is an example of the template pattern:
 
+templates.js
+```js
+templates = {}
 
+templates.numberList = (title, numbers) => {
+  let items = ''
+  for (let item of numbers)
+    items += `<li>${item}</li>`
+    
+  return `
+    <div class="num-title">${title}</div>
+    <ul>
+      ${items}
+    </ul>
+  `;
+};
+
+templates.circle = (radius, color) => `<div style="width:${radius * 2}px;border-radius:50%;background:${color}`;
+
+export default templates
+```
+
+ListMaker.js
+```js
+import templates from './templates.js'
+
+export default class ListMakerPage
+{
+  constructor(page) {
+    page.insertAdjactentHTML('beforeend', templates.numberList("Some Numbers", [1,2,3]);
+    page.insertAdjactentHTML('beforeend', templates.circle(100, "#FFC");
+    page.insertAdjactentHTML('beforeend', templates.numberList("More Numbers", [5,10,15]);
+  }
+}
+```
+
+Again, templates, should be independently testable. you should be able to just import the templates file on a blank html page and insert any template by passing the data it expects.  The exception is if it uses custom tags, you should be able to just import/define the custom tags, and generate the template.  So template + tags is still 100% independent testable items, not depending on the app in any way.  Note that while you should be able to test the returned html, if you wanted to visually test it, you would typically need to also include the page css.
 
 
 ## AppTemplate File Structure
@@ -168,11 +205,24 @@ tags/combo-box/       // may use shadow dom to mimic built in html tags
 /vendors/             // dependencies not maintained by app. is yuck.
 ```
 
+## App.js
+
+
+## Summary
+So up to here, it may seem like these are just some arbitrary implementation details of one little demo app.  However, extreme care has been taken to separate the concepts into independent, testable parts, with very clear (minimal) inter-dependencies.  If this structure is followed, than much of the code will be well-encapsulated in tags, blocks, templates, and pages, as little testable components.  Then the page will be filled with higher-level business logic, and it won't be mixed with all the lower level concerns. So most of the code will likely end up in the small independently testable chunks.
+
+Finally, note that the Page could be a very sophisticated system, with submodules, external files, dynamic dependencies, etc.  But all of that would be contained within the folder for that one page class (and possibly some blocks/tags), so that other pages would remain simple, and the core application structure would also remain simple.  Additionally, a common pattern for when a particular page becomes very complex is to split it into it's own SPA, and so the apptemplate could be reused in a collection of several SPA's that form a common app, and eg share the data object.  With a bit of persisting state in localstorage, it can feel seemless to the user.
 
 
 # FAQ
 
-## Why not a 'framework'?
+## Is this just another framework?
+While the structure of AppTemplate probably feels similar to a framework, that is because we have taken the good of a framework, the application structure patterns, and instead just used them on the 'intended framework' that is built into modern browsers.  Even the items in Shell can just be customized for your application, without issues since the main thing is that they provide good separation of the app initialization and the independent 'tools'.  So this is much more like the 'app templates' that Visual Studio may provide for building apps against Forms or WPF, etc.
+
+## Why not make a general 'component'? Why blocks/tags/pages
+Many frameworks suffer from being 'too generic'.  They have a default 'component' pattern, and it's up to you to organize them, and typically they can be nested in any way.  Here, we have an opinionated selection of 'layers', based on how apps typically are stuctured.  The benefit of this is that the components are far more testable, and **the most reusable components are the most isolated and testable.**  So the tags layer is very independent, no access to data, and those tags are likely to be used all throughout the program.  The blocks will probably just be used in a few places, and so they are designed to make it easy and have access to data layer.  Still we don't allow nesting, to keep testability.  For Pages, they are components but they are likely to do a lot more reaching out to data, and using events, and updating/setting data etc.  So we separate them as a concept.  These specific component 'categories' allows us to choose more carefully what kind of work we do at each 'layer'.
+
+## Why not use some known framework?
 
 Writing modern web applications has been a challenging, constantly evolving domain of software engineering.  Due to the core JavaScript libraries and the language itself being "different" depending upon which browser was being used, many companies turned to frameworks which had their own flavor of html and their own library of built in methods for web applications.
 
