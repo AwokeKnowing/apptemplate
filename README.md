@@ -14,6 +14,23 @@ The key to AppTemplate is an application structure, which if carefully adhered t
 ![layers-blocks](/app-structure-blocks.jpg "AppTemplate structure")
 
 
+### Shell, data, and tags
+The goal of good app architecture is modularity and testability.  
+ - The Shell is a collection of 'ready to use tools' that make wiring together a new application very easy. The shell includes some basic utility methods (js extensions), and several classes to help with managing dialogs, sessions, and page switching (SPA routing).
+ - The data component is crucial to the success of the app. Many apps make the unmaintainable mistake of not completely separating the data from the rest of the application. The data represents all the objects/arrays/strings that 'perist' when the app is not running. So it is the single source for all 'external' data (data not defined within the app modules). The data can be on an API, a CDN, or a File or any other kind of service.  Note this is not 'html' or templates/images.  Think of it as a set of async methods to get/set json objects.  A key point here is that it can be fully tested on it's own, without the rest of the app
+ - tags are custom-element definitions. in html5 we can define custom tags like `<circle-dropdown>`.  On of the great things that framworks provide is this 'custom tag' ability. Here though, we define them in plain js.  Then the app can use them in any of the templates it uses.  A key point is that tags don't know about eachother, and tags can be tested along, and tags cannot access anything 'outside' like data or app (though potentially some 'property' could accept some data source)
+
+So with a well defined, separated set of 'wiring tools' (shell), and a pure data single source for external data state that can be tested apart from the app, and a rich set of custom tags, the work of building the app is off to a good start.
+
+### App
+
+### Blocks
+
+### Parts / Page Manager
+
+### Pages
+
+
 
 ## AppTemplate File Structure
 In order to implement the application structure, it's important to know what the folders are for, so that all new code is added in the right place, and the dependency guarantees are maintained, to keep the parts testable.
