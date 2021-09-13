@@ -50,7 +50,7 @@ A good way to think of the parts/page manager is:
 | footer part  |
 |--------------|
 
-Crucially, the parts is are all independently testable.  The parts are should be able to be initialized on a blank test page, and they expose methods to manipulate them, as well as listen for events.  They should handle their own style (at least default style, which can be themed/overridden but which is fully functional)
+Crucially, the parts are all independently testable.  The parts are should be able to be initialized on a blank test page, and they expose methods to manipulate them, as well as listen for events.  They should handle their own style (at least default style, which can be themed/overridden but which is fully functional)
 
 
 ### Pages
@@ -98,6 +98,21 @@ export default class MinimalPage
 
 
 ### Blocks
+In general, a page should try to be self-contained, and any sub-parts can held in the page folder and included dynamically or by imports etc.  However, there are likely to be some blocks of html which appear on different pages, and so we want a way to be able to reuse items in different pages.
+
+Blocks are like a higher level of 'tags'.  Think of them as a rendered 'template' of some subscription of the page, where that template is rendered on several different pages.
+
+Blocks, like tags, should not depend on eachother, and should also be testable by being able to be instantiated by themselves on a test page.  The difference with blocks is that they are not implemented as 'tags', but are instantiated and inserted into the page.  Further, the blocks are allowed to access the data layer, to get data for themselves (or the data can be passed to them).  So each block has a folder with at least a JavaScript module.  Any page that wishes to instantiate the block will import that module, and then using e.g. new SomeBlock(targetDiv) will instantiate 1 or more instances of it, and then be able to set properties and call methods on the class to affect the object.
+
+A final note is that Blocks are specifically for reuse.  A 'block' of html should only be promoted to a Block if it is used on more than one page.  Otherwise, it's best to keep it as an implementation detail of a page.  So then the blocks folder will only have those blocks which are intended to appear on multiple different pages.  Individual pages could still make blocks as modules within their own page folder, and only move them to the blocks folder if they end up being used on other pages.
+
+### Summary of dependencies of Tags, Blocks, and Pages
+Again, Pages don't know about other Pages, Blocks don't know about other Blocks, Tags don't know about other tags.  Blocks can use Tags.  Pages can use Blocks and Tags.  A Tag is independently testable.  A Block is independently testable provide it (optionally) receives a reference to the main data object (or mockup).  A Part is independently testable, and a Page is independently testable, again assuming it has access to any Tag, Block, or Part it needs to interact with, and to the main. data object.
+
+### Template pattern
+Templates, meaning snippets of html that need to be merged with data are not official concepts in AppTemplate.  However, modern javascript provides us a convenient way to get very powerful templates.  This method can be used with blocks, tags, or pages as needed.  Templates can be defined inline, or in separate modules.
+
+
 
 
 
