@@ -23,12 +23,81 @@ The goal of good app architecture is modularity and testability.
 So with a well defined, separated set of 'wiring tools' (shell), and a pure data single source for external data state that can be tested apart from the app, and a rich set of custom tags, the work of building the app is off to a good start.
 
 ### App
+The job of the App is to be the entry point. It loads the settings and initializes custom html tags, data api, any long-lived parts like header, footer, and page manager.  It is intentionally limited in functionality as 'piling everying into main.js global space' is the most critical danger to app maintainability.
 
-### Blocks
+Note especially that App is not forced to use anything in Shell.  Things in Shell are utilities which may be used as needed. So shell components can be tested on their own.
+
+There is no default 'app class' to inherit from.  This is very much on purpose again, to avoid global bloat.  Pages generally do not access app.  It is simply the initializer.
 
 ### Parts / Page Manager
+Parts refer to 'parts of the app'.  They are global instances of some part of the app that stays alive throughout the visit, and doesn't get reloaded every time page navigation happens.  Typical example is header and footer, and sidebar, but there can be other things like a 'smart assistant' or 'help chat' or some 'gamification manager' etc.  These are global objects instantiated by the app, and may have permanent visibility, or may just show on some pages, or may not show at all.
+
+The Page Manager is a special 'part' that stays alive throughout the app visit and handles showing/hiding the various pages.  The page manager can be used to initiate navigation to another url/page, and it handles detecting url changes and activating the corresponding page.  Activating a page involves, hiding other pages, showing the container of the new page, and sending an event to the page so it knows it got visibililty (including 404 page).
+
+The Page Manager is provided out of the box in the Shell, for easy page handling.  However other potential strategies or libraries could be used while still following the same general app structure.
+
+A good way to think of the parts/page manager is:
+
+
+| header part  |
+|--------------|
+
+
+| page manager |
+|--------------|
+
+
+| footer part  |
+|--------------|
+
+Crucially, the parts is are all independently testable.  The parts are should be able to be initialized on a blank test page, and they expose methods to manipulate them, as well as listen for events.  They should handle their own style (at least default style, which can be themed/overridden but which is fully functional)
+
 
 ### Pages
+Each page is a module with a class the knows how to build the page, within the element that is passed to the constructor.  The minimal valid page is simply:
+
+MyPage.js
+```js
+export default class MyPage {}
+```
+
+Of course, navigating to the above page would result in a blank page because pageManger creates the root element that is displayed, and gives a default minimum size.  A hello world page would be like this:
+
+HelloWorld.js
+```js
+export default class HelloWorldPage
+{
+  constructor(page) {
+    page.insertAdjacentHTML('beforeend', '<p>Hello World</p>');
+  }
+}
+```
+
+The above results in seeing Hello World when navigating to the HelloWorld page.  Note that navigation is configured in the pageManager.  So page manager is configured to detect a certain url, and activate the HelloWorld class (page).  The page itself can then further inspect the url to show 'subpages' or load different content based on url
+
+Note that the constructor only runs once.  Navigating to other pages and back does not run the constructor again.  Many apps however want to know when the user arrives at the page to load/update things, and they may want to do some action when the user leaves, so that the page will be 'ready' for next visit (ie unload something).
+
+For this purpose, the pageManager sends a custom event 'appshow' on the page when it is showing.  This is much better than a registered callback because the page is not obligated to use it or provide it, and the page manager does not have to be calling methods on the page class (keeps it decoupled).  This allows us to avoid a 'page class' that we would otherwise consider building to 'inherit methods' that the page manager calls (bad coupling, and another place to endlessly stuff logic)
+
+A minimal example of a page would be:
+
+Minimal.js
+```js
+export default class MinimalPage 
+{
+  constructor(page) {
+    page.insertAdjacentHTML('beforeend', '<p>Hello World</p>');
+    page.addEventListener('appshow', this.onAppShow.bind(page));
+  }
+  
+  onAppShow() {
+    this.insertAdjacentHTML('beforeend', '<div>Welcome Back</div>');
+  }
+}
+```
+
+
+### Blocks
 
 
 
