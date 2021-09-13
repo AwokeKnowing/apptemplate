@@ -67,7 +67,7 @@ tags/combo-box/       // may use shadow dom to mimic built in html tags
 
 
 
-#FAQ
+# FAQ
 
 ## Why not a 'framework'?
 
