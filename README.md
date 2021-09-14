@@ -251,6 +251,8 @@ The built-in pageManager class has an addPage method with two parameters: canGoF
 in App.js
 
 ```js
+import pageManager from './shell/page-manager/pageManager.js
+
 import MyPage    from './pages/my-page/MyPage.js'
 import OtherPage from './pages/other-page/OtherPage.js'
 
