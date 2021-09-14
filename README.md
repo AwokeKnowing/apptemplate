@@ -233,7 +233,7 @@ export default class MyPage
     }
     
     try {
-      await data.products.delInventoryItem("item5, 1);
+      await data.products.delInventoryItem("item5", 1);
     } catch (e) {
       dialogManager.error("couldn't remove item");
     }
@@ -259,6 +259,7 @@ pageManager.addPage(OtherPage, url=>/other-page/i.test(url))
 
 ```
 
+Each time the url changes, all the functions are tested and the one that matches will have it's page html element set to visible, and receive the appshow message.
 
 
 ## Summary
