@@ -243,12 +243,26 @@ export default class MyPage
 Notice for our main business logic we don't deal with Promises and callbacks.  The async io work is all done in the data modules.
 
 
-## App.js
+## App.js and page routing
+Besides loading configuration and global application parts, once of the main uses of App.js is to set up page routing.
+
+The built-in pageManager class has an addPage method with two parameters: canGoFn and pageClass. the canGoFn function is a function that takes a url as a parameter, and returns true if that page should handle that url, otherwise false.  So as a result, the typical way to implement it is with a regular express test of the url:
+
+in App.js
+
+```js
+import MyPage    from './pages/my-page/MyPage.js'
+import OtherPage from './pages/other-page/OtherPage.js'
+
+pageManager.addPage(MyPage,    url=>/my-page/i.test(url) || url==='')
+pageManager.addPage(OtherPage, url=>/other-page/i.test(url))
+
+```
 
 
 
 ## Summary
-So up to here, it may seem like these are just some arbitrary implementation details of one little demo app.  However, extreme care has been taken to separate the concepts into independent, testable parts, with very clear (minimal) inter-dependencies.  If this structure is followed, than much of the code will be well-encapsulated in tags, blocks, templates, and pages, as little testable components.  Then the page will be filled with higher-level business logic, and it won't be mixed with all the lower level concerns. So most of the code will likely end up in the small independently testable chunks.
+At first it may seem like these are just some arbitrary implementation details of one little demo app.  However, extreme care has been taken to separate the concepts into independent, testable parts, with very clear (minimal) inter-dependencies.  If this structure is followed, than much of the code will be well-encapsulated in tags, blocks, templates, and pages, as little testable components.  Then the page will be filled with higher-level business logic, and it won't be mixed with all the lower level concerns. So most of the code will likely end up in the small independently testable chunks.
 
 Finally, note that the Page could be a very sophisticated system, with submodules, external files, dynamic dependencies, etc.  But all of that would be contained within the folder for that one page class (and possibly some blocks/tags), so that other pages would remain simple, and the core application structure would also remain simple.  Additionally, a common pattern for when a particular page becomes very complex is to split it into it's own SPA, and so the apptemplate could be reused in a collection of several SPA's that form a common app, and eg share the data object.  With a bit of persisting state in localstorage, it can feel seemless to the user.
 
@@ -256,7 +270,7 @@ Finally, note that the Page could be a very sophisticated system, with submodule
 # FAQ
 
 ## Is this just another framework?
-While the structure of AppTemplate probably feels similar to a framework, that is because we have taken the good of a framework, the application structure patterns, and instead just used them on the 'intended framework' that is built into modern browsers.  Even the items in Shell can just be customized for your application, without issues since the main thing is that they provide good separation of the app initialization and the independent 'tools'.  So this is much more like the 'app templates' that Visual Studio may provide for building apps against Forms or WPF, etc.
+While the structure of AppTemplate probably feels similar to a framework, that is because we have taken the good of a framework, the application structure patterns, and instead just used them on the 'intended framework' that is built into modern browsers.  Even the items in Shell can just be customized for your application, without issues since the main thing is that they provide good separation of the app initialization and the independent 'tools'.  So this is much more like the 'app templates' that Visual Studio may provide for building apps against Forms or WPF, etc., whereas the 'browser itself' is like the .NET Framework
 
 ## Why not make a general 'component'? Why blocks/tags/pages
 Many frameworks suffer from being 'too generic'.  They have a default 'component' pattern, and it's up to you to organize them, and typically they can be nested in any way.  Here, we have an opinionated selection of 'layers', based on how apps typically are stuctured.  The benefit of this is that the components are far more testable, and **the most reusable components are the most isolated and testable.**  So the tags layer is very independent, no access to data, and those tags are likely to be used all throughout the program.  The blocks will probably just be used in a few places, and so they are designed to make it easy and have access to data layer.  Still we don't allow nesting, to keep testability.  For Pages, they are components but they are likely to do a lot more reaching out to data, and using events, and updating/setting data etc.  So we separate them as a concept.  These specific component 'categories' allows us to choose more carefully what kind of work we do at each 'layer'.
@@ -301,13 +315,14 @@ Typically, there's just a folder per file type, and everything else is free-for-
 
 Fundamentally, the flaw is that there is no modularity.  Pieces cannot be tested on their own typically, because all the code/css has self-references and cannot run on it's own.  The lack of modularity also means changes in one place have unpredictable effects in other places.  The app will be easy to write at first, but it will become very hard to maintain and extend as it grows.
 
-## Why is Framework code usually 'nicer' than 'vannilla' projects?
+## Why is Framework code often 'nicer' than 'vanilla' projects?
 We can learn a lot from the various frameworks that have come out.  But what are the real reasons it seems cleaner?
  - application folder stucture
  - modularity concepts (classes, dependency management, modules, plugins)
  - clear way to separate and combine html/js/data
  - 'framework extensions' that already do the hard part
  - pre-made ui components
+ - hidden complexity (taking written 'syntactic sugar' code and generating 'real' code)
 
 What's not apparent at first site is that the real reason is because Software Engineers who have to take on very large complex projects typically are very experienced, and know how to write clean, well-structured code.  A framework represents talented Engineers figuring out an application structure that will support the maintainability and testability that they need for their large project.  Further, since they have built something that other devs must use, typically they need to show a lot of examples and usecases to communicate the structure, and they need to solve a lot of classic problems (how to get data, do templates/components).  And futher, they tend to be on teams of other highly talented engineers who take the structure and create a great app, hopefully open source, and so other people see this structure, and nice clean code, and they copy it.  
 
