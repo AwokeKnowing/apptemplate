@@ -205,7 +205,45 @@ tags/combo-box/       // may use shadow dom to mimic built in html tags
 /vendors/             // dependencies not maintained by app. is yuck.
 ```
 
+## data
+A common challenge is that application code is often litterred with io operations in the middle of business logic.  Often it's in the form of calls to rest api's or other services, or downloading json files or posting data and waiting for respondes.  The code is full of business logic inside callbacks and promises.  Further, the same data is often accessed on multiple pages, leading to duplication of these nesting/callback patterns.
+
+With modern async/await, and with moving all the io into data modules, we can massivly clean up application business logic code.  The basic structure of the data api is to be separated into a collection of modules, where each module has a series of async getters and setters which return javascript objects.  With this structure, application code will look like:
+
+```js
+import data          from '../../data/data.js'
+import templates     from './templates.js'
+import dialogManager from '../../shell/dialogManager/dialogManager.js'
+
+export default class MyPage
+{
+  constructor(page) {
+    this.page = page;
+    page.addEventListener('appshow', onShow.bind(this));
+  }
+  
+  async onShow()
+    let recentSales = await data.sales.getRecentHistory({order:"desc"})
+    page.innerHTML = templates.saleList(recentSales);
+    
+    try {
+      await data.sales.addNewSale("1.00", "item5")
+    catch (e) {
+      dialogManager.alert("couldn't save sale")
+    }
+    
+    try {
+      await data.products.delInventoryItem("item5, 1);
+    catch (e) {
+     dialogManager.alert("couldn't remove item")
+    }
+}
+```
+
+
+
 ## App.js
+
 
 
 ## Summary
