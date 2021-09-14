@@ -271,6 +271,25 @@ Note that the Page could be a very sophisticated system, with submodules, extern
 
 Finally, to reiterate the goal: with this structure, it is expected that the vast majority of the app code will be in small, independently testable chunks with very limited and well-defined dependencies. That is, there will be many tags, many blocks, many modules/methods in data, and many templates, so that the actual code in each page is easy to understand.  So the end result is an app that has a very clear simple initialization with minimal steps, and then Page code that builds a page and solves problems at a high level, using many modular, testable pieces. 
 
+## questions to look into:
+
+### application structure core 
+
+#### routing 
+
+####  internationalization 
+
+####  reactivity (ux, preloader spinning)
+
+####  proxy objects (modern js)
+
+####  template engine (because of markup legibility)
+
+####  'event bus' (SPA updating 'far away things' like on other pages)
+
+####  lifecycle hooks (onLoad onReady onNavigate OnBeforeNavigate etc)
+    
+
 
 # FAQ
 
