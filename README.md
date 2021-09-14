@@ -335,7 +335,7 @@ The lesson is that nice code involves clear, modular folder stuctures, carefully
 
 Why not just use it then? Again, the reason is that most of the code in the framework is not really solving your specific problems, and it's forcing you into an alternate world of 'fake' html/js (which doesn't 'work' without some kind of interpretation, maintained by someone else.)  We can simply borrow the good (application structure) and transfer that to our projects.
 
-Now that browser vendors have agreed on built-in ways to accomplish many of the technical concerns of frameworks, the main things we need to get clean code without a framework is solid folder structure, sample code in that structure, some key (but very small) technical concerns (page switching), and documentation of the sample code to clarify how the code can be extended. 
+Now that browser vendors have agreed on built-in ways to accomplish many of the technical concerns of frameworks, the main things we need to get clean code without a framework is solid folder structure, a few patterns for modular components, sample code in that structure, some key (but very small) technical concerns (page switching), and documentation of the sample code to clarify how the code can be extended. 
 
 Bottom line, we need a documented 'template' and code patterns that we can start and extend.
 
