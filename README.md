@@ -227,19 +227,20 @@ export default class MyPage
     page.innerHTML = templates.saleList(recentSales);
     
     try {
-      await data.sales.addNewSale("1.00", "item5")
-    catch (e) {
-      dialogManager.alert("couldn't save sale")
+      await data.sales.addNewSale("1.00", "item5");
+    } catch (e) {
+      dialogManager.error("couldn't save sale");
     }
     
     try {
       await data.products.delInventoryItem("item5, 1);
-    catch (e) {
-     dialogManager.alert("couldn't remove item")
+    } catch (e) {
+      dialogManager.error("couldn't remove item");
     }
 }
 ```
 
+Notice for our main business logic we don't deal with Promises and callbacks.  The async io work is all done in the data modules.
 
 
 ## App.js
