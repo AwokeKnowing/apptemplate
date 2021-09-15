@@ -150,7 +150,7 @@ export default class ListMakerPage
 }
 ```
 
-Again, templates, should be independently testable. you should be able to just import the templates file on a blank html page and insert any template by passing the data it expects.  The exception is if it uses custom tags, you should be able to just import/define the custom tags, and generate the template.  So template + tags is still 100% independent testable items, not depending on the app in any way.  Note that while you should be able to test the returned html, if you wanted to visually test it, you would typically need to also include the page css.
+Again, templates, should be independently testable. you should be able to just import the templates file on a blank html page and insert any template by passing the data it expects.  The exception is if it uses custom tags, you should be able to just import/define the custom tags, and generate the template.  So template + tags is still 100% independent testable items, not depending on the app in any way.  Note that while you should be able to test the returned html, if you wanted to visually test it, you would typically need to also include the page or block css.
 
 
 ## AppTemplate File Structure
@@ -242,6 +242,8 @@ export default class MyPage
 
 Notice for our main business logic we don't deal with Promises and callbacks.  The async io work is all done in the data modules.
 
+TODO: DATA IMPLEMENTATION (and proxy objects?)
+
 
 ## App.js and page routing
 Besides loading configuration and global application parts, once of the main uses of App.js is to set up page routing.
@@ -265,6 +267,11 @@ Each time the url changes, all the functions are tested and the one that matches
 
 Once the activate page receives activation, it can further process the url as needed for any 'sub-pages'
 
+## text strings and internationalization
+For applications that are multilingual or prefer to have all strings in one place, the module(s) in `data/text/` will contain all the text and handle getting text asyncronously.  When rendering templates, that text is passed in. It's considered that users will spend the vast majority of their time with one language setting.  Therefore, the language preference is set at page load, and a change in language should trigger a page reload, and then all pages/blocks will render be rendered again with the new language. 
+
+TODO: EXAMPLE
+
 
 ## Summary
 At first it may seem like these are just some arbitrary implementation details of one little demo app.  However, extreme care has been taken to separate the concepts into independent, testable parts, with very clear (minimal) inter-dependencies.  If this structure is followed, than much of the code will be well-encapsulated in tags, blocks, templates, and pages, as little testable components.  Then the page will be filled with higher-level business logic, and it won't be mixed with all the lower level concerns. So most of the code will likely end up in the small independently testable chunks.
@@ -275,21 +282,42 @@ Finally, to reiterate the goal: with this structure, it is expected that the vas
 
 ## questions to look into:
 
-
-####  internationalization 
-
 ####  reactivity (ux, preloader spinning)
 
 ####  proxy objects (modern js)
 
 ####  template engine (because of markup legibility)
 
-
 ####  lifecycle hooks (onLoad onReady onNavigate OnBeforeNavigate etc)
     
 
 
 # FAQ
+
+## Why do templates have JavaScript? Shouldn't we keep code and templates separate?
+Most people using templates have found that data in arrays often needs to be merged, and sometimes there are if/then parts in a template.  The popular templating languages all support 'loops' and if/then/else and some suport more arbitrary expressions.  So in the end, it's clear that while logic for validating data and business logic and other app logic should be separate from the template, building a template requires a way to do simple iteration of arrays and simple branching at least.  
+
+Rather than some arbitrary 'language' like 
+```html
+<div>
+{{#mylist}}
+  <div>{{item}}</div>
+{{^mylist}}
+ <p>no items</p>
+{{/mylist}}
+</div>
+```
+
+We simply agree to use basic loops and branching in a 'template method' with the understanding it MUST NOT reach outside or affect global state or do complex validation etc.  By agreeing to this, we get:
+1. We can use the native template strings in JS, not some 'template language'
+2. We can 'import' the templates (no need io/promise)
+3. We don't need some engine to parse the strings and bloat the project
+
+That said, nothing stops you from dropping in a template library in your index file and just rendering with that and dealing with the file loading some other way. The goal of this app template though, is to provide a way to do 'templates' natively and still get the benfits of 'arrays and branching' that template langauges provide.
+
+## My editor doesn't show HTML highlighting for JS templates.
+Some editors are better than others at highlighting, but first, ask yourself how much it really will slow you down, as far as time to make the application. Templates are typically fairly small blocks that fit on one screen, and we all know and can read html regardless of the colors. That said, one solution is to look for plugins for your editor or make one yourself.  Another solution would be a little utility that shows the rendered version, eg a kind of wysiwyg editor.  Another solution is to use your 'alternate template language' and write a little converter to output the js template.  [Here's an example of a plugin for VS Code](https://marketplace.visualstudio.com/items?itemName=Tobermory.es6-string-html)
+
 
 ## Why is there no event bus system?
 1. There is already a powerful event system in the DOM, with triggering and bubbling and canceling etc. Use it. The whole point of this structure is to use the native systems and not reinvent them.
