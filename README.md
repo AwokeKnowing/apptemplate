@@ -263,6 +263,8 @@ pageManager.addPage(OtherPage, url=>/other-page/i.test(url))
 
 Each time the url changes, all the functions are tested and the one that matches will have it's page html element set to visible, and receive the appshow message.
 
+Once the activate page receives activation, it can further process the url as needed for any 'sub-pages'
+
 
 ## Summary
 At first it may seem like these are just some arbitrary implementation details of one little demo app.  However, extreme care has been taken to separate the concepts into independent, testable parts, with very clear (minimal) inter-dependencies.  If this structure is followed, than much of the code will be well-encapsulated in tags, blocks, templates, and pages, as little testable components.  Then the page will be filled with higher-level business logic, and it won't be mixed with all the lower level concerns. So most of the code will likely end up in the small independently testable chunks.
@@ -273,9 +275,6 @@ Finally, to reiterate the goal: with this structure, it is expected that the vas
 
 ## questions to look into:
 
-### application structure core 
-
-#### routing 
 
 ####  internationalization 
 
@@ -285,13 +284,19 @@ Finally, to reiterate the goal: with this structure, it is expected that the vas
 
 ####  template engine (because of markup legibility)
 
-####  'event bus' (SPA updating 'far away things' like on other pages)
 
 ####  lifecycle hooks (onLoad onReady onNavigate OnBeforeNavigate etc)
     
 
 
 # FAQ
+
+## Why is there no event bus system?
+1. There is already a powerful event system in the DOM, with triggering and bubbling and canceling etc. Use it. The whole point of this structure is to use the native systems and not reinvent them.
+2. This is not an arbitrary component architecture. This is a well-defined modular architecture. Component architectures can be arbitrarily nested and be any size, and connect to basically any other component through a graph structure and event bus.  We already 'have' that in the DOM, but we are purposefully providing a higher-level limited modular structure to get isolation. In component architectures, something like a page is just a root node of a bunch of child components. It knows which ones they are but otherwise basically doesn't know what they are.  In contrast, this app template structures pages as having JavaScript imperative code that knows exactly what the components are and how to update them if needed. The page will know when the user arrives, and it can handle the components on the page, using the global data api to have up to date information. 
+3. Tags do not need a bus since they are generic isolated components (like a p or input or div). Blocks do not need a bus because they usually work fine on their own and don't update.  If they do, they can be notified to update by the page, or they can monitor the data api directly.  Pages do not need an event bus because they own all the state they need to work with, and don't influence other pages except through the global data.
+4. If some app really needed/wanted some specific 3rd party or custom event bus, it could be added.  Any components that needed it could register with it, without forcing the whole app to abandon the native event system.
+5. The best way to think about it is, 'components' on one page cannot communicate components on other pages (though they could through the dom event bus if needed).  Pages own all the state on their page, and can change 'global data'.  Components on other pages will know when their page is active to update data, or their page can notify them.  This is a specifically designed limitation to ensure stronger decoupling and greater simplicity matching real-world scenarios. There is a clear, hard line drawn between the components at the page level.
 
 ## Is this just another framework?
 While the structure of AppTemplate probably feels similar to a framework, that is because we have taken the good of a framework, the application structure patterns, and instead just used them on the 'intended framework' that is built into modern browsers.  Even the items in Shell can just be customized for your application, without issues since the main thing is that they provide good separation of the app initialization and the independent 'tools'.  So this is much more like the 'app templates' that Visual Studio may provide for building apps against Forms or WPF, etc., whereas the 'browser itself' is like the .NET Framework
