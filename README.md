@@ -286,8 +286,6 @@ Finally, to reiterate the goal: with this structure, it is expected that the vas
 
 ####  proxy objects (modern js)
 
-####  template engine (because of markup legibility)
-
 ####  lifecycle hooks (onLoad onReady onNavigate OnBeforeNavigate etc)
     
 
