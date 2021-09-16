@@ -267,6 +267,8 @@ Each time the url changes, all the functions are tested and the one that matches
 
 Once the activate page receives activation, it can further process the url as needed for any 'sub-pages'
 
+TODO: 404 handling
+
 ## text strings and internationalization
 For applications that are multilingual or prefer to have all strings in one place, the module(s) in `data/text/` will contain all the text and handle getting text asyncronously.  When rendering templates, that text is passed in. It's considered that users will spend the vast majority of their time with one language setting.  Therefore, the language preference is set at page load, and a change in language should trigger a page reload, and then all pages/blocks will render be rendered again with the new language. 
 
